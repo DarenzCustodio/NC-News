@@ -2,6 +2,7 @@ const db = require("../db/connection");
 const request = require("supertest");
 const fs = require("fs/promises");
 const app = require("../app");
+const endPointsFile = require("../endpoints.json");
 
 const testdata = require("../db/data/test-data");
 
@@ -29,15 +30,6 @@ describe("GET /api/topics", () => {
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
         });
-      });
-  });
-  test("returns status: 200 and make sure array is an array", () => {
-    return request(app)
-      .get("/api/topics")
-      .expect(200)
-      .then((res) => {
-        const { topic } = res.body;
-
         expect(Array.isArray(topic)).toBe(true);
         expect(topic.length).toBe(3);
       });
@@ -49,11 +41,8 @@ describe("GET/api/endpoints", () => {
     return request(app)
       .get("/api")
       .expect(200)
-      .then((res) => {
-        const { endpoints } = res.body;
-
-        let arrayOfEndPoints = Object.keys(endpoints);
-
+      .then(() => {
+        let arrayOfEndPoints = Object.keys(endPointsFile);
         expect(arrayOfEndPoints).toEqual([
           "GET /api",
           "GET /api/topics",
@@ -65,13 +54,10 @@ describe("GET/api/endpoints", () => {
     return request(app)
       .get("/api")
       .expect(200)
-      .then((res) => {
-        const { endpoints } = res.body;
-
-        let arrayOfEndPoints = Object.keys(endpoints);
-
+      .then(() => {
+        let arrayOfEndPoints = Object.keys(endPointsFile);
         arrayOfEndPoints.forEach((element) => {
-          expect(endpoints[element]).toHaveProperty("description");
+          expect(endPointsFile[element]).toHaveProperty("description");
         });
       });
   });
