@@ -3,14 +3,32 @@ const app = express();
 
 const { getTopics, getEndpoints } = require("./controllers/topics.controllers");
 
+const { getArticleId } = require("./controllers/articles.controllers");
+
 app.get("/api/topics", getTopics);
 
 app.get("/api", getEndpoints);
 
-app.use((err, req, res, next)=>{
-    if(err.msg && err.status){
-        res.status(err.status).send({msg: err.msg})
-    }
-})
+app.get("/api/articles/:article_id", getArticleId);
+
+app.use((err, req, res) => {
+  if (err.msg && err.status) {
+    res.status(err.status).send({ msg: err.msg });
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Bad request" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.msg === "Not found") {
+    res.status(404).send({ msg: err.msg });
+  }
+});
 
 module.exports = app;

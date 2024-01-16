@@ -80,3 +80,43 @@ describe("GET/api/endpoints", () => {
       });
   });
 });
+
+describe("GET/api/articles/article_id", () => {
+  test("returns status:200 and returns all the articles according to article_id", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((res) => {
+        const { article } = res.body;
+
+        expect(article).toHaveProperty("article_id");
+        expect(article).toHaveProperty("title");
+        expect(article).toHaveProperty("topic");
+        expect(article).toHaveProperty("author");
+        expect(article).toHaveProperty("body");
+        expect(article).toHaveProperty("created_at");
+        expect(article).toHaveProperty("votes");
+        expect(article).toHaveProperty("article_img_url");
+      });
+  });
+  test("returns status:400 with a error message when provided with non-existent article_id", () => {
+    return request(app)
+      .get("/api/articles/not_a_id")
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("returns status:404 with a error message when provided with valid but non-existent article_id", () => {
+    return request(app)
+      .get("/api/articles/100")
+      .expect(404)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Not found");
+      });
+  });
+});
