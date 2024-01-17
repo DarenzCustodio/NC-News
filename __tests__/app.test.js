@@ -165,6 +165,7 @@ describe("GET/api/articles/:article_id/comments", () => {
       .expect(200)
       .then((res) => {
         const { comments } = res.body;
+        expect(comments.length > 0).toBe(true);
 
         comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
@@ -196,6 +197,26 @@ describe("GET/api/articles/:article_id/comments", () => {
         expect(comments).toBeSortedBy("created_at", {
           descending: true,
         });
+      });
+  });
+  test("returns status:404 if the article_id is not found in the database ", () => {
+    return request(app)
+      .get("/api/articles/100")
+      .expect(404)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Not found");
+      });
+  });
+  test("returns status:200 If the article is valid but doesn't have any comments associated with it", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then((res) => {
+        const { comments } = res.body;
+
+        expect(comments.length).toBe(0);
       });
   });
 });
