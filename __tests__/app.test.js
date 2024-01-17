@@ -89,14 +89,23 @@ describe("GET/api/articles/article_id", () => {
       .then((res) => {
         const { article } = res.body;
 
-        expect(article).toHaveProperty("article_id");
-        expect(article).toHaveProperty("title");
-        expect(article).toHaveProperty("topic");
-        expect(article).toHaveProperty("author");
-        expect(article).toHaveProperty("body");
-        expect(article).toHaveProperty("created_at");
-        expect(article).toHaveProperty("votes");
-        expect(article).toHaveProperty("article_img_url");
+        expect(article.title).toBe("Living in the shadow of a great man");
+        expect(article.topic).toBe("mitch");
+        expect(article.author).toBe("butter_bridge");
+        expect(article.body).toBe("I find this existence challenging");
+        expect(article.created_at).toBe("2020-07-09T20:11:00.000Z");
+        expect(article.votes).toBe(100);
+        expect(article.article_img_url).toBe(
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
+
+        expect(typeof article.title).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.body).toBe("string");
+        expect(typeof article.created_at).toBe("string");
+        expect(typeof article.votes).toBe("number");
+        expect(typeof article.article_img_url).toBe("string");
       });
   });
   test("returns status:400 with a error message when provided with non-existent article_id", () => {
@@ -117,6 +126,50 @@ describe("GET/api/articles/article_id", () => {
         const { msg } = res.body;
 
         expect(msg).toBe("Not found");
+      });
+  });
+});
+
+describe("GET/api/articles", () => {
+  test("returns status:200 and returns all data from all endpoints", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        const { article } = res.body;
+
+        article.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+        });
+      });
+  });
+  test("returns status:200 and the articles sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then((res) => {
+        const { article } = res.body;
+
+        expect(article).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("returns status: 400 with invalid sort by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid")
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Invalid sort by query");
       });
   });
 });
