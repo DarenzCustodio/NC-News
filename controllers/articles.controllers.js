@@ -2,6 +2,7 @@ const fs = require("fs/promises");
 const {
   fetchArticleId,
   fetchAllArticles,
+  fetchAllArticleComments,
 } = require("../models/articles.models");
 
 exports.getArticleId = (req, res, next) => {
@@ -22,6 +23,18 @@ exports.getAllArticles = (req, res, next) => {
   fetchAllArticles(sort_by)
     .then((data) => {
       res.status(200).send({ article: data });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getAllArticleComments = (req, res, next) => {
+  const { article_id } = req.params;
+
+  fetchAllArticleComments(article_id)
+    .then((articleComment) => {
+      res.status(200).send({ comments: articleComment });
     })
     .catch((err) => {
       next(err);

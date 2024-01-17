@@ -47,6 +47,8 @@ describe("GET/api/endpoints", () => {
           "GET /api",
           "GET /api/topics",
           "GET /api/articles",
+          "GET /api/articles/:article_id",
+          "GET /api/articles/:article_id/comments",
         ]);
       });
   });
@@ -170,6 +172,48 @@ describe("GET/api/articles", () => {
         const { msg } = res.body;
 
         expect(msg).toBe("Invalid sort by query");
+      });
+  });
+});
+
+describe("GET/api/articles/:article_id/comments", () => {
+  test("returns status: 200 and returns all comemnts on any given article ", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((res) => {
+        const { comments } = res.body;
+
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+      });
+  });
+  test("returns status:400 when given invalid article_id", () => {
+    return request(app)
+      .get("/api/articles/invalid_id/comments")
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("returns status:200 and the comments sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((res) => {
+        const { comments } = res.body;
+
+        expect(comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
       });
   });
 });
