@@ -3,7 +3,10 @@ const app = express();
 
 const { getTopics, getEndpoints } = require("./controllers/topics.controllers");
 
-const { getArticleId } = require("./controllers/articles.controllers");
+const {
+  getArticleId,
+  getAllArticles,
+} = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
 
@@ -11,9 +14,13 @@ app.get("/api", getEndpoints);
 
 app.get("/api/articles/:article_id", getArticleId);
 
-app.use((err, req, res) => {
+app.get("/api/articles", getAllArticles);
+
+app.use((err, req, res, next) => {
   if (err.msg && err.status) {
     res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
   }
 });
 
