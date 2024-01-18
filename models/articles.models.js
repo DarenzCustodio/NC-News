@@ -38,29 +38,18 @@ exports.fetchAllArticleComments = (article_id) => {
 };
 
 exports.addCommentData = (addComment, article_id) => {
-  if (
-    addComment.author === undefined ||
-    addComment.body === undefined ||
-    article_id === undefined
-  ) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  } else {
-    return db
-      .query(
-        `INSERT INTO comments (author, body, article_id, created_at, votes)
+  return db
+    .query(
+      `INSERT INTO comments (author, body, article_id, created_at, votes)
         VALUES ($1, $2, $3, $4, $5) RETURNING*;`,
-        [addComment.author, addComment.body, article_id, new Date(), 0]
-      )
-      .then((addComment) => {
-        return addComment.rows[0];
-      });
-  }
+      [addComment.username, addComment.body, article_id, new Date(), 0]
+    )
+    .then((addComment) => {
+      return addComment.rows[0];
+    });
 };
 
 exports.updateArticleVotes = (article_id, inc_votes) => {
-  //   if (typeof inc_votes !== "number") {
-  //     return Promise.reject({ status: 400, msg: "Bad request" });
-  //   }
   return db
     .query(
       `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING*;`,
