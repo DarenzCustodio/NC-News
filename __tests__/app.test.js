@@ -226,7 +226,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 describe("POST /api/articles/:article_id/comments", () => {
   test("returns status:201 and POST comment retruns all the properties of the posted object", () => {
     const addComment = {
-      author: "rogersop",
+      username: "rogersop",
       body: "testComment",
     };
     return request(app)
@@ -236,21 +236,36 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then((res) => {
         const { comment } = res.body;
 
-        expect(comment).toHaveProperty("comment_id", expect.any(Number));
+        expect(comment).toHaveProperty("comment_id", 19);
         expect(comment).toHaveProperty("article_id", 1);
-        expect(comment).toHaveProperty("author", expect.any(String));
-        expect(comment).toHaveProperty("body", expect.any(String));
-        expect(comment).toHaveProperty("votes", expect.any(Number));
+        expect(comment).toHaveProperty("author", "rogersop");
+        expect(comment).toHaveProperty("body", "testComment");
+        expect(comment).toHaveProperty("votes", 0);
         expect(comment).toHaveProperty("created_at", expect.any(String));
       });
   });
-  test("returns status:400 and returns error message when posting comment to invalid article_id", () => {
+  test("returns status:404 and returns error message when posting comment to invalid article_id", () => {
     const addComment = {
-      author: "rogersop",
+      username: "rogersop",
       body: "testComment",
     };
     return request(app)
       .post("/api/articles/100/comments")
+      .send(addComment)
+      .expect(404)
+      .then((res) => {
+        const { msg } = res.body;
+        expect(msg).toBe("Not found");
+      });
+  });
+  test("returns status:400 and returns error message when posting comment to invalid article_id", () => {
+    const addComment = {
+      username: "rogersop",
+      body: "testComment",
+    };
+    return request(app)
+      .post("/api/articles/invalid_id/comments")
+      .send(addComment)
       .expect(400)
       .then((res) => {
         const { msg } = res.body;
