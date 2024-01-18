@@ -6,7 +6,6 @@ const {
   addCommentData,
   updateArticleVotes,
 } = require("../models/articles.models");
-const { log } = require("console");
 
 exports.getArticleId = (req, res, next) => {
   const { article_id } = req.params;
