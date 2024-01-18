@@ -8,6 +8,7 @@ const {
   getAllArticles,
   getAllArticleComments,
   postComment,
+  patchArticleVotes,
 } = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
@@ -21,6 +22,8 @@ app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id/comments", getAllArticleComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", patchArticleVotes);
 
 app.use((err, req, res, next) => {
   if (err.msg && err.status) {
