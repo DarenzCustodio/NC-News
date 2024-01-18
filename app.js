@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
-
+app.use(express.json());
 const { getTopics, getEndpoints } = require("./controllers/topics.controllers");
 
 const {
   getArticleId,
   getAllArticles,
   getAllArticleComments,
+  postComment,
 } = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
@@ -18,6 +19,8 @@ app.get("/api/articles/:article_id", getArticleId);
 app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id/comments", getAllArticleComments);
+
+app.post("/api/articles/:article_id/comments", postComment);
 
 app.use((err, req, res, next) => {
   if (err.msg && err.status) {
@@ -36,8 +39,18 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(404).send({ msg: "Not found" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
   if (err.msg === "Not found") {
     res.status(404).send({ msg: err.msg });
+  } else {
+    next(err);
   }
 });
 

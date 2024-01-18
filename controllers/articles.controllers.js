@@ -3,7 +3,9 @@ const {
   fetchArticleId,
   fetchAllArticles,
   fetchAllArticleComments,
+  addCommentData,
 } = require("../models/articles.models");
+const { log } = require("console");
 
 exports.getArticleId = (req, res, next) => {
   const { article_id } = req.params;
@@ -35,6 +37,19 @@ exports.getAllArticleComments = (req, res, next) => {
   fetchAllArticleComments(article_id)
     .then((articleComment) => {
       res.status(200).send({ comments: articleComment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const addComment = req.body;
+
+  addCommentData(addComment, article_id)
+    .then((data) => {
+      res.status(201).send({ comment: data });
     })
     .catch((err) => {
       next(err);
