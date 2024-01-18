@@ -52,6 +52,7 @@ describe("GET /api/endpoints", () => {
           "POST /api/articles/:article_id/comments",
           "PATCH /api/articles/:article_id",
           "DELETE /api/comments/:comment_id",
+          "GET /api/users",
         ]);
       });
   });
@@ -372,6 +373,25 @@ describe("DELETE /api/comments/:comment_id", () => {
         const { msg } = res.body;
 
         expect(msg).toBe("Bad request");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("GET: 200 returns all users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((res) => {
+        const { users } = res.body;
+
+        expect(users.length > 0).toBe(true);
+
+        users.forEach((user) => {
+          expect(user).toHaveProperty("username", expect.any(String));
+          expect(user).toHaveProperty("name", expect.any(String));
+          expect(user).toHaveProperty("avatar_url", expect.any(String));
+        });
       });
   });
 });
