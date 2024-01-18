@@ -59,5 +59,18 @@
       }
     ]
   }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "returns posted comment object",
+    "queries": [],
+    "exampleResponse": {
+      "addComment": 
+      { 
+        "author": "rogersop", 
+        "body": "testComment"
+     }
+  }
   }
 }
+
+

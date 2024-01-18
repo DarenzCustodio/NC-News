@@ -36,7 +36,7 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET/api/endpoints", () => {
+describe("GET /api/endpoints", () => {
   test("returns status:200 with an array of all the available endpoints", () => {
     return request(app)
       .get("/api")
@@ -49,6 +49,7 @@ describe("GET/api/endpoints", () => {
           "GET /api/articles",
           "GET /api/articles/:article_id",
           "GET /api/articles/:article_id/comments",
+          "POST /api/articles/:article_id/comments",
         ]);
       });
   });
@@ -83,7 +84,7 @@ describe("GET/api/endpoints", () => {
   });
 });
 
-describe("GET/api/articles/article_id", () => {
+describe("GET /api/articles/article_id", () => {
   test("returns status:200 and returns all the articles according to article_id", () => {
     return request(app)
       .get("/api/articles/1")
@@ -124,7 +125,7 @@ describe("GET/api/articles/article_id", () => {
   });
 });
 
-describe("GET/api/articles", () => {
+describe("GET /api/articles", () => {
   test("returns status:200 and returns all data from all endpoints", () => {
     return request(app)
       .get("/api/articles")
@@ -158,7 +159,7 @@ describe("GET/api/articles", () => {
   });
 });
 
-describe("GET/api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   test("returns status: 200 and returns all comemnts on any given article ", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -217,6 +218,42 @@ describe("GET/api/articles/:article_id/comments", () => {
         const { comments } = res.body;
 
         expect(comments.length).toBe(0);
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("returns status:201 and POST comment retruns all the properties of the posted object", () => {
+    const addComment = {
+      author: "rogersop",
+      body: "testComment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(addComment)
+      .expect(201)
+      .then((res) => {
+        const { comment } = res.body;
+
+        expect(comment).toHaveProperty("comment_id", expect.any(Number));
+        expect(comment).toHaveProperty("article_id", 1);
+        expect(comment).toHaveProperty("author", expect.any(String));
+        expect(comment).toHaveProperty("body", expect.any(String));
+        expect(comment).toHaveProperty("votes", expect.any(Number));
+        expect(comment).toHaveProperty("created_at", expect.any(String));
+      });
+  });
+  test("returns status:400 and returns error message when posting comment to invalid article_id", () => {
+    const addComment = {
+      author: "rogersop",
+      body: "testComment",
+    };
+    return request(app)
+      .post("/api/articles/100/comments")
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+        expect(msg).toBe("Bad request");
       });
   });
 });
