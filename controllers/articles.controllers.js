@@ -4,6 +4,7 @@ const {
   fetchAllArticles,
   fetchAllArticleComments,
   addCommentData,
+  updateArticleVotes,
 } = require("../models/articles.models");
 const { log } = require("console");
 
@@ -50,6 +51,19 @@ exports.postComment = (req, res, next) => {
   addCommentData(addComment, article_id)
     .then((data) => {
       res.status(201).send({ comment: data });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticleVotes = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const { article_id } = req.params;
+
+  updateArticleVotes(article_id, inc_votes)
+    .then((updateArticleVotes) => {
+      res.status(200).send({ article: updateArticleVotes });
     })
     .catch((err) => {
       next(err);

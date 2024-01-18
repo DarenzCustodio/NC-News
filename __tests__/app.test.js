@@ -50,6 +50,7 @@ describe("GET /api/endpoints", () => {
           "GET /api/articles/:article_id",
           "GET /api/articles/:article_id/comments",
           "POST /api/articles/:article_id/comments",
+          "PATCH /api/articles/:article_id",
         ]);
       });
   });
@@ -253,6 +254,58 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((res) => {
         const { msg } = res.body;
+        expect(msg).toBe("Bad request");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("returns status:200 and updates the article votes", () => {
+    const newVotes = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(200)
+      .then((res) => {
+        const { article } = res.body;
+
+        expect(article).toHaveProperty("article_id", 1);
+        expect(article).toHaveProperty("title", expect.any(String));
+        expect(article).toHaveProperty("author", expect.any(String));
+        expect(article).toHaveProperty("topic", expect.any(String));
+        expect(article).toHaveProperty("body", expect.any(String));
+        expect(article).toHaveProperty("created_at", expect.any(String));
+        expect(article).toHaveProperty("votes", expect.any(Number));
+        expect(article).toHaveProperty("article_img_url", expect.any(String));
+      });
+  });
+  test("returns status:404 and returns error message when patch request to non-existent article_id", () => {
+    const newVotes = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/200")
+      .send(newVotes)
+      .expect(404)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Not found");
+      });
+  });
+  test("returns status:400 and retruns error message when patch request to valid article_d but invalid votes", () => {
+    const newVotes = {
+      inc_votes: "invalid_votes",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+
         expect(msg).toBe("Bad request");
       });
   });
