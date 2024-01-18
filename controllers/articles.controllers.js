@@ -63,7 +63,7 @@ exports.patchArticleVotes = (req, res, next) => {
 
   updateArticleVotes(article_id, inc_votes)
     .then((updateArticleVotes) => {
-      res.status(200).send({ article: updateArticleVotes });
+      res.status(200).send({ updatedArticle: updateArticleVotes });
     })
     .catch((err) => {
       next(err);

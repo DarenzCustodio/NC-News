@@ -284,16 +284,25 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(newVotes)
       .expect(200)
       .then((res) => {
-        const { article } = res.body;
+        const { updatedArticle } = res.body;
 
-        expect(article).toHaveProperty("article_id", 1);
-        expect(article).toHaveProperty("title", expect.any(String));
-        expect(article).toHaveProperty("author", expect.any(String));
-        expect(article).toHaveProperty("topic", expect.any(String));
-        expect(article).toHaveProperty("body", expect.any(String));
-        expect(article).toHaveProperty("created_at", expect.any(String));
-        expect(article).toHaveProperty("votes", expect.any(Number));
-        expect(article).toHaveProperty("article_img_url", expect.any(String));
+        expect(updatedArticle).toHaveProperty("article_id", 1);
+        expect(updatedArticle).toHaveProperty(
+          "title",
+          "Living in the shadow of a great man"
+        );
+        expect(updatedArticle).toHaveProperty("author", "butter_bridge");
+        expect(updatedArticle).toHaveProperty("topic", "mitch");
+        expect(updatedArticle).toHaveProperty(
+          "body",
+          "I find this existence challenging"
+        );
+        expect(updatedArticle).toHaveProperty("created_at", expect.any(String));
+        expect(updatedArticle).toHaveProperty("votes", 101);
+        expect(updatedArticle).toHaveProperty(
+          "article_img_url",
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
       });
   });
   test("returns status:404 and returns error message when patch request to non-existent article_id", () => {
@@ -316,6 +325,20 @@ describe("PATCH /api/articles/:article_id", () => {
     };
     return request(app)
       .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("returns status:400 and retruns error message when patch request to invalid article_id", () => {
+    const newVotes = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/articles/invalid_id")
       .send(newVotes)
       .expect(400)
       .then((res) => {
