@@ -53,10 +53,11 @@ describe("GET /api/endpoints", () => {
           "PATCH /api/articles/:article_id",
           "DELETE /api/comments/:comment_id",
           "GET /api/users",
+          "GET /api/articles?topic",
         ]);
       });
   });
-  test("returns status:200 checking all the available endpoints include a description property", () => {
+  test("GET:200 checking all the available endpoints include a description property", () => {
     return request(app)
       .get("/api")
       .expect(200)
@@ -129,7 +130,7 @@ describe("GET /api/articles/article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("returns status:200 and returns all data from all endpoints", () => {
+  test("GET:200 and returns all data from all endpoints", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -158,6 +159,25 @@ describe("GET /api/articles", () => {
         expect(article).toBeSortedBy("created_at", {
           descending: true,
         });
+      });
+  });
+  test("200 the number of articles associated with given topic has the correct length", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((res) => {
+        const { article } = res.body;
+
+        expect(article.length === 12).toBe(true);
+      });
+  });
+  test("400: returns error message when sending a get request to a topic that does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=not_a_topic")
+      .expect(400)
+      .then((res) => {
+        const { msg } = res.body;
+        expect(msg).toBe("Bad request");
       });
   });
 });
