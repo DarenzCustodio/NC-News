@@ -169,6 +169,10 @@ describe("GET /api/articles", () => {
         const { article } = res.body;
 
         expect(article.length === 12).toBe(true);
+
+        article.forEach((element) => {
+          expect(element).toHaveProperty("topic", "mitch");
+        });
       });
   });
   test("400: returns error message when sending a get request to a topic that does not exist", () => {
